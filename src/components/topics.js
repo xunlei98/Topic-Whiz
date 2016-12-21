@@ -47,7 +47,8 @@ module.exports = React.createClass({
       snap.forEach(topic => {
         topics.push({
           title: topic.val().title,
-          author: topic.val().author
+          author: topic.val().author,
+          key: topic.key
         });
       });
       this.setState({ dataSource: ds.cloneWithRows(topics) });
@@ -70,22 +71,37 @@ module.exports = React.createClass({
     });
   },
 
+  details(data) {
+    this.props.navigator.push({
+      name: 'topicDetail',
+      displayName: this.state.displayName,
+
+      title: data.title,
+      author: data.author,
+
+      row_uid: data.key
+    });
+  },
+
   renderRow(rowData) {
     return (
-      <View style={styles.row}>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => this.details(rowData)}
+      >
         <Text style={styles.rowTitle}>
           {rowData.title}
         </Text>
         <Text>
           {rowData.author}
         </Text>
-      </View>
+      </TouchableOpacity>
     );
   },
 
   render() {
     return (
-      <View style={styles.topics}>
+      <View style={styles.flexContainer}>
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => this.signOut()}
@@ -103,7 +119,7 @@ module.exports = React.createClass({
             placeholder='Something on your mind?'
             style={styles.input}
             onChangeText={(text) => this.setState({ title: text })}
-            onEndEditing={() => this.addTopic()}
+            onSubmitEditing={() => this.addTopic()}
           />
           <ListView
             style={styles.list}
